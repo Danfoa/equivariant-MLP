@@ -106,6 +106,8 @@ class Rep(object):
             logging.info(f"Solving basis for {self}"+(f", for G={self.G}" if hasattr(self,"G") else ""))
             #if isinstance(group,Trivial): return np.eye(size(rank,group.d))
             C_lazy = canon_rep.constraint_matrix()
+            # C = densify(C_lazy)
+            # C_np = np.array(C)
             if C_lazy.shape[0]*C_lazy.shape[1]>3e7: #Too large to use SVD
                 result = krylov_constraint_solve(C_lazy)
             else:
@@ -248,9 +250,11 @@ class Base(Rep):
     def size(self):
         assert self.G is not None, f"must know G to find size for rep={self}"
         return self.G.d
-    def __repr__(self): return str(self)#f"T{self.rank+(self.G,)}"
+    def __repr__(self):
+        return str(self)#f"T{self.rank+(self.G,)}"
+    
     def __str__(self):
-        return "V"# +(f"_{self.G}" if self.G is not None else "")
+        return f"V[{str(self.G)}]"# +(f"_{self.G}" if self.G is not None else "")
     
     def __hash__(self):
         return hash((type(self),self.G))
